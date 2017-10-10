@@ -4,9 +4,9 @@ This is a modular and simple compression software written in python.
 
 The basic and famous compression algorithms:
 
- *shannon fano
- *huffman encoding
- *LZW
+ * shannon fano
+ * huffman encoding
+ * LZW
  
 have been implemented and can be used to compress any file.
 
@@ -19,5 +19,5 @@ The decompression button chooses the decompression algorithm based on the traili
 
 Finally, the ‘learn’ button is present at the end so that the user can train the software on different file formats so that the user gets the optimal compression ratio every time based on their own personal usage. It invokes all three compression ratios and updates the compression ratio data in the data-file to essentially train the software.
 
-###NOTE: 
+### NOTE: 
 This project is mainly for educational purposes, as the algorithms used are very basic and are not as capable as the compression techniques used today.
