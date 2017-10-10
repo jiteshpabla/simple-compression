@@ -1,15 +1,10 @@
-# Written by Nick Jones for Josh Davis's CS 201 course at Carleton College, November 2010.
-
 from huffmantreenode import HuffmanTreeNode
 from queue import Queue
 from huffmantree import HuffmanTree
 import sys
 
-#import profile ###############################
-#import timeit
 
-
-def encode(fileName):
+def huff_encode(fileName):
 	"""Takes in a fileName, creates a HuffmanTree and compresses the original file based on this tree."""
 	try:
 		wholeDoc = open(fileName, 'r')
@@ -28,23 +23,24 @@ def encode(fileName):
 	originalSize = tree.getRoot().getWeight()/1024.0
 	
 	# write the file:
-	outFileName = fileName[:len(fileName) - 4] + 'Compressed.txt'
-	
+	#outFileName = fileName[:len(fileName) - 4] + 'Compressed.txt'
+	outFileName = fileName + "_huff"
 	f = open(outFileName, 'w')
 	f.write(chars)
 	print 'Done. Your compressed file is saved as:', outFileName
 	print 'Original:', originalSize, 'KB;', 'Compressed:', compressedSize, 'KB'
 	print 'Compression rate of', compressedSize/originalSize
+	return compressedSize/originalSize
 	
-def decode(fileName):
+def huff_decode(fileName):
 	"""Takes in a file name, rebuilds dictionary and writes the decompressed file."""
 	(rebuiltDict, truncatedFileStr) = importDict(fileName)
 	if (rebuiltDict, truncatedFileStr) != (None, None):
 		tree = HuffmanTree()
 		tree.setCodeWords(rebuiltDict)
 		reconstructed = tree.decodeFile(truncatedFileStr)
-		outFileName = fileName[:fileName.index('Compressed.txt')]
-		outFileName += 'Decompressed.txt'
+		outFileName = fileName[:fileName.index('_huff')]
+		outFileName = outFileName[:outFileName.index('.')] + 'Decompressed' + outFileName[outFileName.index('.'):]
 		f = open(outFileName, 'w')
 		f.write(reconstructed)
 		
@@ -53,7 +49,7 @@ def decode(fileName):
 def createHuffmanNodes(docStr):
 	"""Reads string of entire document (docStr) and returns a dictionary of form: individual character -> HuffmanNode for that char"""
 	results = {}
-	for x in docStr: # increment weight, else create a new node with weight 1
+	for x in docStr: 
 		try:
 			temp = results[x]
 			temp.setWeight(temp.getWeight() + 1)
@@ -66,16 +62,16 @@ def createTree(allNodes):
 	listNodes = allNodes.values()
 	listNodes.sort(compareHuffNodes)
 		
-	singleNodes = Queue() # will contain all HTNodes at first
-	comboNodes = Queue() # will contain trees - nodes with others hanging off
+	singleNodes = Queue() 
+	comboNodes = Queue()
 	while len(listNodes) > 0:
-		singleNodes.enqueue(listNodes.pop(0)) # these will be sorted with least weight at front
+		singleNodes.enqueue(listNodes.pop(0))
 	
 	
 	while len(singleNodes) + len(comboNodes) > 1:
 		i = 0
 		temp = [None, None]
-		for i in range(2): # tiny for loop saves code!
+		for i in range(2):
 		
 			singleNodeWeight = None
 			comboNodeWeight = None
@@ -88,7 +84,7 @@ def createTree(allNodes):
 				temp[i] = comboNodes.dequeue()
 			elif comboNodeWeight < singleNodeWeight and comboNodeWeight != None:
 				temp[i] = comboNodes.dequeue()
-			else: # they can't both be None, so no need to check if singleNodeWeight is None
+			else: 
 				temp[i] = singleNodes.dequeue()
 					
 		parent = HuffmanTreeNode()
@@ -117,7 +113,7 @@ def importDict(fileName):
 	while entryNum < numEntries: 
 		
 		tempchar = f.read(1)
-		temp = f.read(1) # start of length of codeword
+		temp = f.read(1) 
 		length = ''
 		while temp != ':':
 			length += temp
@@ -128,12 +124,12 @@ def importDict(fileName):
 		i = 0
 		for i in range(length/8):
 			encodedChar = f.read(1)
-			tempBinStr = bin(ord(encodedChar))[2:] # don't want the '0b'
-			binStr += tempBinStr.zfill(8) # char => binary => add zeros to make length 8
-		if length % 8 != 0: # there's an extra char left to read
+			tempBinStr = bin(ord(encodedChar))[2:] 
+			binStr += tempBinStr.zfill(8) 
+		if length % 8 != 0: 
 			encodedChar = f.read(1)
-			tempBinStr = bin(ord(encodedChar))[2:] # don't want the '0b'
-			binStr += tempBinStr.zfill(length % 8) # char => binary => add zeros to make length = length % 8
+			tempBinStr = bin(ord(encodedChar))[2:] 
+			binStr += tempBinStr.zfill(length % 8) 
 		
 		rebuiltDict[tempchar] = binStr
 		entryNum += 1
@@ -149,15 +145,10 @@ def compareHuffNodes(node1, node2):
 if __name__ == "__main__":
 	if sys.argv[1] == 'compress':
 		encode(sys.argv[2])
-		
-		#profile.run('print(encode(sys.argv[2])); print()')  #######################
+
 
 	elif sys.argv[1] =='decompress':
 		decode(sys.argv[2])
 	else:
 		print 'Invalid input. Please enter in the form: huffman.py [compress/decompress] [filename]'
 
-
-	#t = timeit.Timer("print('main statement')", "print('setup')") ########################
-	#print('TIMEIT:')
-	#print(t.timeit(1))
